@@ -1,0 +1,193 @@
+@import"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Ubuntu+Mono:wght@400;700&display=swap";
+
+:root{--accent:#e0e4f0;--accent-rgb:224,228,240}
+html,body{height:100%;margin:0;background:#0a0a0f;font-family:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;color:#e0e4f0}
+body{background:url(pexels-simon73-1183099.jpg) center/cover no-repeat fixed}
+
+#app{position:fixed;inset:0;overflow:auto}
+
+/* ─── Proxy Shell ─── */
+#proxy-shell{position:fixed;inset:0;background:#050607;display:none}
+#proxy-frame{position:absolute;inset:0;border:0;width:100%;height:100%;background:#050607}
+#proxy-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,10,11,.5);opacity:0;pointer-events:none;transition:opacity .2s ease}
+#proxy-loading.show{opacity:1}
+#proxy-loading-art{display:flex;flex-direction:column;align-items:center;gap:16px}
+.loading-spinner{width:36px;height:36px;border:3px solid rgba(var(--accent-rgb),.15);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+.loading-text{font-size:14px;color:rgba(var(--accent-rgb),.5);letter-spacing:.05em}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#proxy-watermark{position:absolute;right:10px;bottom:8px;display:flex;flex-direction:column;align-items:flex-end;gap:3px;opacity:0;pointer-events:auto;color:#b8ffe0;cursor:pointer;transform:scale(0.55);transform-origin:bottom right}
+.watermark-logo{margin:0;font-family:"Ubuntu Mono",monospace;font-size:10px;line-height:1.1;white-space:pre}
+.watermark-hint{font-size:10px;letter-spacing:.06em;text-transform:lowercase}
+
+/* ─── Terminal Shell ─── */
+#terminal-shell{position:fixed;inset:0;background:transparent;transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:none}
+
+#term{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:28px 24px 22px;box-sizing:border-box;gap:0}
+
+/* ─── Landing (terminal mode) ─── */
+#splash-landing{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:28px}
+#splash-logo{font-size:3.2rem;font-weight:700;letter-spacing:10px;background:linear-gradient(135deg,var(--accent) 0%,rgba(var(--accent-rgb),.6) 50%,rgba(var(--accent-rgb),.35) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;user-select:none}
+#splash-tagline{font-size:0.9rem;color:rgba(var(--accent-rgb),.4);letter-spacing:.1em;min-height:1.4em}
+#splash-tagline .cursor{display:inline-block;width:2px;height:1em;background:rgba(var(--accent-rgb),.5);margin-left:1px;vertical-align:text-bottom;animation:blink .6s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+#term-output{width:100%;max-width:560px;overflow:visible;font-size:14px;line-height:1.6;scrollbar-width:none;font-family:"Ubuntu Mono",monospace}
+#term-output::-webkit-scrollbar{width:0;height:0}
+
+#term-status{display:none;gap:8px;font-size:13px;color:rgba(var(--accent-rgb),.5);margin-bottom:8px}
+.term-status-label{color:var(--accent);text-transform:lowercase}
+#term-location{color:#c0c4d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw}
+
+/* ─── Search Bar ─── */
+#term-input-row{display:flex;align-items:center;width:100%;max-width:560px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px 20px;margin-top:0;position:relative;transition:border-color .2s,box-shadow .2s;box-sizing:border-box;backdrop-filter:blur(8px)}
+#term-input-row:focus-within{border-color:rgba(var(--accent-rgb),.4);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.1),0 8px 32px rgba(0,0,0,.3)}
+
+#term-prefix{color:var(--accent);font-family:"Ubuntu Mono",monospace}
+#term-input{flex:1;background:transparent;border:none;outline:none;color:#e8eaf0;font-size:15px;font-family:"Inter",sans-serif;margin-left:0;caret-color:var(--accent)}
+#term-input::placeholder{color:#4a4a5a}
+#search-btn{background:none;border:none;color:#4a4a5a;cursor:pointer;padding:0 0 0 8px;display:flex;align-items:center;transition:color .2s}
+#search-btn:hover{color:var(--accent)}
+body.mode-proxy #search-btn{display:none}
+
+#term-cursor{position:absolute;top:50%;width:.62em;height:1.2em;background:var(--accent);transform:translateY(-50%);pointer-events:none;animation:cursorBlink 1.1s steps(1) infinite}
+#term-cursor.hidden{opacity:0;animation:none}
+#term-cursor-measure{position:absolute;visibility:hidden;white-space:pre;font:"Ubuntu Mono",monospace;padding:0;margin:0}
+@keyframes cursorBlink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+
+/* ─── Quick Links ─── */
+#quick-links{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px;max-width:560px}
+.qlink{position:relative;display:flex;align-items:center;padding:8px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;color:#b0b4c8;font-size:0.8rem;font-weight:500;cursor:pointer;transition:all .2s;text-decoration:none;user-select:none;backdrop-filter:blur(8px)}
+.qlink:hover{background:rgba(var(--accent-rgb),.1);border-color:rgba(var(--accent-rgb),.3);color:#e0e4f0;transform:translateY(-1px)}
+.qlink-x{display:none;position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:rgba(255,80,80,.85);color:#fff;font-size:10px;line-height:16px;text-align:center;cursor:pointer;border:none;padding:0}
+.qlink:hover .qlink-x{display:block}
+.qlink-add{background:rgba(var(--accent-rgb),.08);border:1px dashed rgba(var(--accent-rgb),.3);color:var(--accent);cursor:pointer;font-size:0.8rem;font-weight:600}
+.qlink-add:hover{background:rgba(var(--accent-rgb),.18);border-color:rgba(var(--accent-rgb),.5);color:#e0e4f0;transform:translateY(-1px)}
+/* ─── Add Link Modal ─── */
+#add-link-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,20,.85);z-index:10000;align-items:center;justify-content:center}
+#add-link-overlay.open{display:flex}
+#add-link-modal{background:rgba(14,14,22,.97);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;width:280px;box-shadow:0 10px 40px rgba(0,0,0,.5);backdrop-filter:blur(12px)}
+#add-link-modal h3{margin:0 0 14px;font-size:0.95rem;font-weight:600;color:#e0e4f0}
+.add-link-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;color:#e0e4f0;font-size:0.85rem;font-family:"Inter",sans-serif;outline:none;box-sizing:border-box;margin-bottom:10px;transition:border-color .2s}
+.add-link-input:focus{border-color:rgba(var(--accent-rgb),.4)}
+.add-link-btns{display:flex;gap:8px;justify-content:flex-end}
+.add-link-btns button{border:none;border-radius:8px;padding:8px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all .15s}
+.add-link-cancel{background:rgba(255,255,255,.06);color:rgba(var(--accent-rgb),.5)}
+.add-link-cancel:hover{background:rgba(255,255,255,.1);color:#e0e4f0}
+.add-link-save{background:var(--accent);color:#fff}
+.add-link-save:hover{opacity:.85}
+
+/* ─── Settings Button & Panel ─── */
+#settings-btn{position:fixed;top:16px;right:16px;z-index:999;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(var(--accent-rgb),.5);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+#settings-btn:hover{background:rgba(var(--accent-rgb),.1);border-color:rgba(var(--accent-rgb),.4);color:#e0e4f0;transform:scale(1.1)}
+#settings-panel{display:none;position:fixed;top:66px;right:16px;z-index:1000;width:220px;max-height:420px;overflow-y:auto;background:rgba(14,14,22,.97);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;box-shadow:0 10px 40px rgba(0,0,0,.5);backdrop-filter:blur(12px);scrollbar-width:none}
+#settings-panel::-webkit-scrollbar{width:0}
+.settings-header{font-size:0.95rem;font-weight:600;color:#e0e4f0;margin-bottom:12px}
+.settings-section{border-top:1px solid rgba(255,255,255,.06)}
+.settings-section:first-of-type{border-top:none}
+.settings-section-label{font-size:0.7rem;color:rgba(var(--accent-rgb),.45);text-transform:uppercase;letter-spacing:.08em;padding:10px 0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.section-arrow{font-size:0.65rem;transition:transform .2s ease}
+.settings-section.collapsed .section-arrow{transform:rotate(-90deg)}
+.settings-section-body{overflow:hidden;transition:max-height .25s ease,opacity .2s ease;max-height:500px;opacity:1;padding-bottom:6px}
+.settings-section.collapsed .settings-section-body{max-height:0;opacity:0;padding-bottom:0}
+.cloak-option{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:rgba(var(--accent-rgb),.65);font-size:0.82rem;cursor:pointer;transition:all .15s;border:2px solid transparent}
+.cloak-option:hover{background:rgba(255,255,255,.05)}
+.cloak-option.active{border-color:var(--accent);color:#e0e4f0}
+.cloak-option-icon{font-size:1rem;width:20px;text-align:center}
+.settings-action{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:rgba(var(--accent-rgb),.65);font-size:0.82rem;cursor:pointer;transition:all .15s}
+.settings-action:hover{background:rgba(255,255,255,.05);color:#e0e4f0}
+.settings-action-icon{font-size:1rem;width:20px;text-align:center}
+body.mode-proxy #settings-btn{display:none}
+body.mode-proxy #settings-panel{display:none}
+
+/* ─── Terminal Output Lines ─── */
+.term-line{margin:3px 0;white-space:pre-wrap;word-break:break-word;font-family:"Ubuntu Mono",monospace}
+.term-pre{font-family:"Ubuntu Mono",monospace;color:#c0c8d8;margin:8px 0 14px;white-space:pre}
+
+/* ─── Games Panel ─── */
+.games-panel{margin:8px 0 12px;font-size:14px;line-height:1.55;font-family:"Ubuntu Mono",monospace}
+.games-section-title{color:var(--accent);margin-top:6px}
+.games-line{display:flex;align-items:center;gap:10px;padding:4px 8px;border-radius:8px;color:#c0c4d8;transition:background .15s}
+.games-line.is-selected{background:rgba(var(--accent-rgb),.15);color:#e8eaf0}
+.games-line.is-clickable{cursor:pointer}
+.games-number{color:var(--accent);width:3ch;text-align:right}
+.games-empty{color:#5a5a6a;margin-left:12px}
+.games-hint{color:#5a5a6a;margin-top:8px}
+.games-match{background:rgba(var(--accent-rgb),.2);color:#e0e4f0;padding:0 2px;border-radius:4px}
+
+/* ─── Links ─── */
+#term-output a{color:var(--accent);text-decoration:none}
+#term-output a:hover{text-decoration:underline;opacity:.8}
+
+/* ─── Landing mode: hide terminal chrome ─── */
+body.mode-terminal #term-prefix{display:none}
+body.mode-terminal #term-cursor{display:none}
+body.mode-terminal #term-input{caret-color:var(--accent)}
+body.mode-terminal #terminal-shell{transform:translateY(0);pointer-events:auto;background:transparent}
+body.mode-terminal .term-pre{display:none}
+
+/* ─── Proxy Mode ─── */
+body.mode-proxy #proxy-shell{display:block}
+/* ─── Panic Hint ─── */
+#panic-hint{margin-top:14px;font-size:0.68rem;color:rgba(var(--accent-rgb),.18);letter-spacing:.04em}
+body.mode-proxy #panic-hint{display:none}
+
+/* ─── Widgets ─── */
+#widgets{display:flex;gap:20px;align-items:center;justify-content:center;margin-top:18px;font-size:0.82rem;color:rgba(var(--accent-rgb),.45);background:rgba(255,255,255,.03);border-radius:10px;padding:8px 16px;backdrop-filter:blur(8px)}
+#widget-time{display:flex;align-items:center;gap:6px}
+#widget-weather{display:flex;align-items:center;gap:6px}
+body.mode-proxy #widgets{display:none}
+
+/* ─── Settings: Panic URL input ─── */
+.panic-url-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 10px;color:#e0e4f0;font-size:0.82rem;font-family:"Inter",sans-serif;outline:none;box-sizing:border-box;transition:border-color .2s}
+.panic-url-input:focus{border-color:rgba(var(--accent-rgb),.4)}
+
+/* ─── Settings: Background upload ─── */
+/* ─── Settings: Color themes ─── */
+#theme-options{display:flex;flex-wrap:wrap;gap:6px}
+.theme-swatch{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;padding:0}
+.theme-swatch:hover{transform:scale(1.15)}
+.theme-swatch.active{border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.3)}
+.theme-swatch-custom{background:rgba(255,255,255,.1) !important;position:relative;overflow:hidden;font-size:18px;color:rgba(var(--accent-rgb),.6);display:flex;align-items:center;justify-content:center}
+.theme-swatch-custom::before{content:"+";position:relative;z-index:1;pointer-events:none}
+.theme-color-input{position:absolute;inset:-4px;opacity:0;cursor:pointer;width:calc(100% + 8px);height:calc(100% + 8px);border:none;padding:0;border-radius:50%}
+
+.bg-upload-btn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:rgba(var(--accent-rgb),.65);font-size:0.82rem;cursor:pointer;transition:all .15s;border:none;background:rgba(255,255,255,.04);width:100%;box-sizing:border-box;font-family:"Inter",sans-serif}
+.bg-upload-btn:hover{background:rgba(255,255,255,.06);color:#e0e4f0}
+.bg-reset-btn{display:none;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:#ff6b6b;font-size:0.82rem;cursor:pointer;transition:all .15s;border:none;background:rgba(255,80,80,.08);width:100%;box-sizing:border-box;font-family:"Inter",sans-serif;margin-top:6px}
+.bg-reset-btn:hover{background:rgba(255,80,80,.15)}
+
+body.mode-proxy #splash-landing{display:none}
+body.mode-proxy #quick-links{display:none}
+
+body.mode-proxy #terminal-shell{
+  height:32vh;width:min(760px,84vw);left:50%;top:auto;right:auto;bottom:16px;
+  transform:translate(-50%,calc(100% + 30px));pointer-events:none;
+  border:1px solid rgba(255,255,255,.06);border-radius:14px;
+  background:rgba(14,14,22,.96);
+  box-shadow:0 10px 40px rgba(0,0,0,.6);
+  backdrop-filter:blur(12px)
+}
+body.mode-proxy #term{justify-content:flex-start;align-items:stretch;padding:16px 20px 14px}
+body.mode-proxy #term-output{max-width:none;overflow-y:auto}
+body.mode-proxy #term-input-row{max-width:none;background:transparent;border:none;border-radius:0;padding:0;margin-top:6px}
+body.mode-proxy #term-input-row:focus-within{box-shadow:none;border-color:transparent}
+body.mode-proxy #term-prefix{display:inline;color:var(--accent);font-family:"Ubuntu Mono",monospace}
+body.mode-proxy #term-cursor{display:block}
+body.mode-proxy #term-input{font-family:"Ubuntu Mono",monospace;font-size:14px;caret-color:transparent}
+body.mode-proxy #term-status{display:flex}
+body.mode-proxy #term-location{max-width:50vw}
+
+body.mode-proxy.overlay-open #terminal-shell{transform:translate(-50%,0);pointer-events:auto}
+body.mode-proxy.overlay-open #term-status{display:none}
+
+/* ─── Tab hidden ─── */
+#tab-blackout{position:fixed;inset:0;background:#000;z-index:999999;display:none}
+
+/* ─── Responsive ─── */
+@media(max-width:600px){
+  #splash-logo{font-size:2.2rem;letter-spacing:6px}
+  #term-input-row{padding:12px 16px}
+  #quick-links{gap:6px}
+  .qlink{padding:6px 12px;font-size:0.75rem}
+}
