@@ -2025,7 +2025,7 @@ async function init() {
   if (_rawHash.startsWith("wisp=")) {
     var _wispEnd = _rawHash.indexOf("&");
     var _wispVal = _wispEnd === -1 ? _rawHash.slice(5) : _rawHash.slice(5, _wispEnd);
-    var _wispMap = { beta: "wss://wisp.mercurywork.shop/", regular: "wss://wisp.rhw.one/" };
+    var _wispMap = { beta: "wss://wisp.mercurywork.shop/", beta2: "wss://wisp-server-python-k6wv.onrender.com/", regular: "wss://wisp.rhw.one/" };
     var _wispTarget = _wispMap[_wispVal] || _wispVal;
     setWispUrl(_wispTarget);
     _rawHash = _wispEnd === -1 ? "" : _rawHash.slice(_wispEnd + 1);
@@ -2543,24 +2543,27 @@ init();
   }
   var saved = localStorage.getItem('splash:serverChoice') || 'regular';
   btns.forEach(function(b) {
-    if ((saved === 'beta' && b.id === 'srv-beta') || (saved !== 'beta' && b.id === 'srv-regular')) {
+    if ((saved === 'beta2' && b.id === 'srv-beta2') || (saved === 'beta' && b.id === 'srv-beta') || (saved !== 'beta' && saved !== 'beta2' && b.id === 'srv-regular')) {
       setActive(b);
     }
     b.addEventListener('click', async function() {
       var wisp = b.dataset.wisp;
       setActive(b);
-      localStorage.setItem('splash:serverChoice', b.id === 'srv-beta' ? 'beta' : 'regular');
+      localStorage.setItem('splash:serverChoice', b.id === 'srv-beta2' ? 'beta2' : b.id === 'srv-beta' ? 'beta' : 'regular');
       if (statusEl) statusEl.textContent = 'Switching...';
       try {
         await setWispUrl(wisp);
-        if (statusEl) statusEl.textContent = 'Connected to ' + (b.id === 'srv-beta' ? 'Beta' : 'Regular');
+        if (statusEl) statusEl.textContent = 'Connected to ' + (b.id === 'srv-beta2' ? 'Beta 2' : b.id === 'srv-beta' ? 'Beta' : 'Regular');
         setTimeout(function() { if (statusEl) statusEl.textContent = ''; }, 2000);
       } catch(e) {
         if (statusEl) statusEl.textContent = 'Failed to switch';
       }
     });
   });
-  if (saved === 'beta') {
+  if (saved === 'beta2') {
+    var beta2Btn = document.getElementById('srv-beta2');
+    if (beta2Btn) beta2Btn.click();
+  } else if (saved === 'beta') {
     var betaBtn = document.getElementById('srv-beta');
     if (betaBtn) betaBtn.click();
   }
