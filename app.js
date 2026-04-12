@@ -2512,3 +2512,42 @@ if (proxyWatermark) {
 })();
 
 init();
+
+// ─── Server toggle (Regular / Beta) ───
+(function() {
+  var btns = document.querySelectorAll('.server-btn');
+  var statusEl = document.getElementById('server-status');
+  if (!btns.length) return;
+  var saved = localStorage.getItem('splash:serverChoice') || 'regular';
+  btns.forEach(function(b) {
+    if ((saved === 'beta' && b.id === 'srv-beta') || (saved !== 'beta' && b.id === 'srv-regular')) {
+      b.classList.add('active');
+      b.style.borderColor = '#7b2ff7';
+      b.style.background = '#2a1a4a';
+    }
+    b.addEventListener('click', async function() {
+      var wisp = b.dataset.wisp;
+      btns.forEach(function(x) {
+        x.classList.remove('active');
+        x.style.borderColor = '#333';
+        x.style.background = '#1a1a2e';
+      });
+      b.classList.add('active');
+      b.style.borderColor = '#7b2ff7';
+      b.style.background = '#2a1a4a';
+      localStorage.setItem('splash:serverChoice', b.id === 'srv-beta' ? 'beta' : 'regular');
+      if (statusEl) statusEl.textContent = 'Switching...';
+      try {
+        await setWispUrl(wisp);
+        if (statusEl) statusEl.textContent = 'Connected to ' + (b.id === 'srv-beta' ? 'Beta' : 'Regular');
+        setTimeout(function() { if (statusEl) statusEl.textContent = ''; }, 2000);
+      } catch(e) {
+        if (statusEl) statusEl.textContent = 'Failed to switch';
+      }
+    });
+  });
+  if (saved === 'beta') {
+    var betaBtn = document.getElementById('srv-beta');
+    if (betaBtn) betaBtn.click();
+  }
+})();
