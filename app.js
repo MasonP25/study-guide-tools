@@ -2020,7 +2020,18 @@ async function init() {
       startLocationPolling();
     }
   });
-  const token = window.location.hash.replace(/^#/, "");
+  // Check for wisp override in hash (e.g. #wisp=beta&inject=URL)
+  var _rawHash = window.location.hash.replace(/^#/, "");
+  if (_rawHash.startsWith("wisp=")) {
+    var _wispEnd = _rawHash.indexOf("&");
+    var _wispVal = _wispEnd === -1 ? _rawHash.slice(5) : _rawHash.slice(5, _wispEnd);
+    var _wispMap = { beta: "wss://wisp.mercurywork.shop/", regular: "wss://wisp.rhw.one/" };
+    var _wispTarget = _wispMap[_wispVal] || _wispVal;
+    setWispUrl(_wispTarget);
+    _rawHash = _wispEnd === -1 ? "" : _rawHash.slice(_wispEnd + 1);
+    window.location.hash = _rawHash ? "#" + _rawHash : "";
+  }
+  const token = _rawHash || window.location.hash.replace(/^#/, "");
   if (token) {
     const injected = splashAllowInject ? getInjectedTarget(token) : null;
     if (injected !== null) {
@@ -2518,23 +2529,26 @@ init();
   var btns = document.querySelectorAll('.server-btn');
   var statusEl = document.getElementById('server-status');
   if (!btns.length) return;
+  function setActive(btn) {
+    btns.forEach(function(x) {
+      x.classList.remove('active');
+      x.style.borderColor = 'rgba(255,255,255,.08)';
+      x.style.background = 'rgba(255,255,255,.04)';
+      x.style.color = '#e0e4f0';
+    });
+    btn.classList.add('active');
+    btn.style.borderColor = 'rgba(var(--accent-rgb),.5)';
+    btn.style.background = 'rgba(var(--accent-rgb),.12)';
+    btn.style.color = 'var(--accent)';
+  }
   var saved = localStorage.getItem('splash:serverChoice') || 'regular';
   btns.forEach(function(b) {
     if ((saved === 'beta' && b.id === 'srv-beta') || (saved !== 'beta' && b.id === 'srv-regular')) {
-      b.classList.add('active');
-      b.style.borderColor = '#7b2ff7';
-      b.style.background = '#2a1a4a';
+      setActive(b);
     }
     b.addEventListener('click', async function() {
       var wisp = b.dataset.wisp;
-      btns.forEach(function(x) {
-        x.classList.remove('active');
-        x.style.borderColor = '#333';
-        x.style.background = '#1a1a2e';
-      });
-      b.classList.add('active');
-      b.style.borderColor = '#7b2ff7';
-      b.style.background = '#2a1a4a';
+      setActive(b);
       localStorage.setItem('splash:serverChoice', b.id === 'srv-beta' ? 'beta' : 'regular');
       if (statusEl) statusEl.textContent = 'Switching...';
       try {
