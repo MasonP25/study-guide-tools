@@ -2165,7 +2165,7 @@ updateCursor();
 })();
 
 // ─── Time & Weather widgets ───
-(function initWidgets() {
+(async function initWidgets() {
   const timeEl = document.getElementById("widget-time");
   const weatherEl = document.getElementById("widget-weather");
 
@@ -2185,24 +2185,19 @@ updateCursor();
   setInterval(updateTime, 1000);
 
   // Weather widget - uses free wttr.in API (no key needed)
-  // Only fetch if service worker isn't intercepting (avoids proxy issues)
   if (!weatherEl) return;
-  if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
-    fetch("https://wttr.in/?format=%t+%C&m")
-      .then((r) => {
-        if (!r.ok) return Promise.reject();
-        const ct = r.headers.get("content-type") || "";
-        if (ct.includes("text/html")) return Promise.reject();
-        return r.text();
-      })
-      .then((text) => {
-        const cleaned = text.trim();
-        if (cleaned && !cleaned.includes("Unknown") && cleaned.length < 60) {
-          weatherEl.textContent = cleaned;
+  try {
+    const weatherRes = await fetch("https://wttr.in/?format=%t+%C&u");
+    if (weatherRes.ok) {
+      const ct = weatherRes.headers.get("content-type") || "";
+      if (!ct.includes("text/html")) {
+        const text = (await weatherRes.text()).trim();
+        if (text && !text.includes("Unknown") && !text.includes("<") && text.length < 60) {
+          weatherEl.textContent = text;
         }
-      })
-      .catch(() => {});
-  }
+      }
+    }
+  } catch(e) {}
 })();
 
 // ─── Dynamic Quick Links ───
