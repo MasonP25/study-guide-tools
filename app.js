@@ -2165,11 +2165,17 @@ updateCursor();
 })();
 
 // ─── Time & Weather widgets ───
-(async function initWidgets() {
+(function initWidgets() {
   const timeEl = document.getElementById("widget-time");
-  const weatherEl = document.getElementById("widget-weather");
 
-  // Time widget - updates every second
+  function greeting(h) {
+    if (h < 5) return 'Good night';
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    if (h < 21) return 'Good evening';
+    return 'Good night';
+  }
+
   function updateTime() {
     if (!timeEl) return;
     const now = new Date();
@@ -2179,25 +2185,10 @@ updateCursor();
     const h12 = h % 12 || 12;
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    timeEl.textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()} \u2022 ${h12}:${m} ${ampm}`;
+    timeEl.textContent = `${greeting(h)} \u2022 ${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()} \u2022 ${h12}:${m} ${ampm}`;
   }
   updateTime();
   setInterval(updateTime, 1000);
-
-  // Weather widget - uses free wttr.in API (no key needed)
-  if (!weatherEl) return;
-  try {
-    const weatherRes = await fetch("https://wttr.in/?format=%t+%C&u");
-    if (weatherRes.ok) {
-      const ct = weatherRes.headers.get("content-type") || "";
-      if (!ct.includes("text/html")) {
-        const text = (await weatherRes.text()).trim();
-        if (text && !text.includes("Unknown") && !text.includes("<") && text.length < 60) {
-          weatherEl.textContent = text;
-        }
-      }
-    }
-  } catch(e) {}
 })();
 
 // ─── Dynamic Quick Links ───
