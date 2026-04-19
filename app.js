@@ -2185,16 +2185,24 @@ updateCursor();
   setInterval(updateTime, 1000);
 
   // Weather widget - uses free wttr.in API (no key needed)
+  // Only fetch if service worker isn't intercepting (avoids proxy issues)
   if (!weatherEl) return;
-  fetch("https://wttr.in/?format=%t+%C&m")
-    .then((r) => r.ok ? r.text() : Promise.reject())
-    .then((text) => {
-      const cleaned = text.trim();
-      if (cleaned && !cleaned.includes("Unknown")) {
-        weatherEl.textContent = cleaned;
-      }
-    })
-    .catch(() => {});
+  if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
+    fetch("https://wttr.in/?format=%t+%C&m")
+      .then((r) => {
+        if (!r.ok) return Promise.reject();
+        const ct = r.headers.get("content-type") || "";
+        if (ct.includes("text/html")) return Promise.reject();
+        return r.text();
+      })
+      .then((text) => {
+        const cleaned = text.trim();
+        if (cleaned && !cleaned.includes("Unknown") && cleaned.length < 60) {
+          weatherEl.textContent = cleaned;
+        }
+      })
+      .catch(() => {});
+  }
 })();
 
 // ─── Dynamic Quick Links ───
